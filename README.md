@@ -158,6 +158,17 @@ This is a fully static site. It has no build step.
 
 `vercel.json` adds clean URLs plus static headers. `.vercelignore` keeps local-only files like `uploads/` and `.DS_Store` out of the deployment bundle.
 
+### If Vercel shows `404: NOT_FOUND`
+
+Check the project settings in Vercel:
+
+- **Root Directory:** leave empty, or point it to the folder that contains `index.html`
+- **Framework Preset:** `Other`
+- **Build Command:** empty
+- **Output Directory:** empty or `.`
+
+Do **not** set Output Directory to `public`. In this project, `public/` contains image assets only; the actual site entry is root-level `index.html`.
+
 For Netlify / GitHub Pages / Cloudflare Pages, the same applies: no build step, serve the project root.
 
 ### Migration to Next.js (optional)
