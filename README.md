@@ -12,18 +12,20 @@ A polished bilingual (EN / PT-BR) landing page and donation guide built to help 
 
 ```
 .
-├── index.html         # Single entry — landing + guide (hash routes)
-├── styles.css         # All styles (CSS variables, dark theme)
-├── content.js         # 🟡 ALL bilingual copy + campaign stats live here
-├── placeholders.jsx   # Tutorial mockups (SVG) — replace with real screenshots later
-├── app.jsx            # React app (nav, hero, sections, FAQ, share, footer, guide)
+├── index.html         # Single entry: landing + guide (hash routes)
+├── styles.css         # All styles (CSS variables, dark theme, responsive modal)
+├── content.js         # ALL bilingual copy + campaign stats live here
+├── placeholders.jsx   # Screenshot loader for the donation walkthrough
+├── app.jsx            # React app (nav, hero, steps, modal, FAQ, share, footer)
+├── vercel.json        # Static Vercel headers + clean URLs
+├── package.json       # Optional local preview scripts
 └── README.md
 ```
 
 The site is a static, single-page React app. No build step required — React, ReactDOM, and Babel are loaded via `<script>` tags. It deploys cleanly to Vercel, Netlify, GitHub Pages, or any static host.
 
 ### Routes
-- `/` → Landing page (hero, status, why, QF, steps, warning, FAQ, share)
+- `/` → Landing page (hero, quick path, screenshots, warning, status, why, videos, share, FAQ)
 - `#/how-to-donate` → Detailed bilingual donation guide
 - `#/docs` → Alias for the guide
 
@@ -39,13 +41,13 @@ It's a static site. Pick any:
 # Python
 python3 -m http.server 5173
 
-# Node (one-off)
-npx serve .
+# Node
+npm run dev
 
 # Or just open index.html in a browser (some browsers will block the modules — prefer a server)
 ```
 
-Then visit `http://localhost:5173`.
+Then visit `http://localhost:5173` for Python or `http://localhost:3002` for the Node script.
 
 ---
 
@@ -73,7 +75,7 @@ The structure is mirrored between `en` and `pt`, so when you add/change a string
 | Status card labels | `en.status` / `pt.status` |
 | "Why this matters" + topics | `en.why` / `pt.why` |
 | Quadratic Funding explainer | `en.qf` / `pt.qf` |
-| 6 step cards | `en.steps.list[…]` / `pt.steps.list[…]` |
+| Visual walkthrough cards | `en.steps.list[…]` / `pt.steps.list[…]` |
 | Warning bullets | `en.warning` / `pt.warning` |
 | FAQ Q&As | `en.faq.items[…]` / `pt.faq.items[…]` |
 | Share message + buttons | `en.share` / `pt.share` |
@@ -93,7 +95,7 @@ stats: {
   goalDonors: 100,          // denominator of the progress bar
   youtubeSubscribers: 36851,
   watchHours: 11000,
-  suggestedRange: "$1–$10",
+  suggestedRange: "$1-$10",
 },
 ```
 
@@ -117,56 +119,46 @@ If the round ID changes (e.g. `?roundId=17`), update the URL in **three** places
 
 ---
 
-## 🖼️ Replacing placeholder tutorial images
+## 🖼️ Updating tutorial screenshots
 
-Right now, each step uses a hand-crafted SVG mockup defined in `placeholders.jsx`. They're labeled to match the names in `content.js`:
+Each step screenshot is loaded from `public/placeholders/`. The file names are controlled by the `image` keys in `content.js`:
 
-| `image` key | Component in placeholders.jsx |
+| `image` key | File |
 |---|---|
-| `check-eligibility` | `PlaceholderCheckEligibility` |
-| `go-to-passport` | `PlaceholderGoToPassport` |
-| `passport-wallet` | `PlaceholderPassportWallet` |
-| `refresh-score` | `PlaceholderRefreshScore` |
-| `add-to-cart` | `PlaceholderAddToCart` |
-| `checkout` | `PlaceholderCheckout` |
+| `check-eligibility` | `public/placeholders/check-eligibility.png` |
+| `go-to-passport` | `public/placeholders/go-to-passport.png` |
+| `passport-wallet` | `public/placeholders/passport-wallet.png` |
+| `refresh-score` | `public/placeholders/refresh-score.png` |
+| `add-to-cart` | `public/placeholders/add-to-cart.png` |
+| `checkout` | `public/placeholders/checkout.png` |
+| `success` | `public/placeholders/success.png` |
 
-### To swap with real screenshots:
+The screenshots are clickable on both the landing page and guide page. They open in a carousel modal with left/right arrows, keyboard navigation, and mobile-friendly controls.
 
-1. Drop the PNGs into `public/placeholders/` (create the folder), naming them after the keys above (`check-eligibility.png`, `go-to-passport.png`, etc.).
-2. Open `placeholders.jsx` and replace the `Placeholder` lookup at the bottom:
-
-```js
-const Placeholder = ({ name }) => (
-  <img
-    src={`public/placeholders/${name}.png`}
-    alt={name}
-    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-  />
-);
-window.Placeholder = Placeholder;
-```
-
-Recommended source aspect ratio: **16:10**, ~1280×800 or larger. Keep the highlighted button visually obvious (a colored outline or arrow works great).
+Recommended source aspect ratio: **16:9 or 16:10**, at least ~1280px wide. Keep the highlighted button visually obvious.
 
 ---
 
 ## 🌐 EN / PT-BR toggle
 
-The toggle lives in the top nav. The user's choice is persisted to `localStorage` under key `os-lang`. On first visit, the language defaults to **PT-BR** if the browser language starts with `pt`, otherwise **EN**.
+The toggle lives in the top nav. The user's choice is persisted to `localStorage` under key `os-lang`. On first visit, the language defaults to **EN**.
 
 ---
 
 ## 🚀 Deploying to Vercel
 
-This is a fully static site, so the simplest path is:
+This is a fully static site. It has no build step.
 
 1. Push the repo to GitHub.
-2. Import into Vercel — choose **"Other"** as the framework preset (no build step needed).
+2. Import into Vercel and choose **Other** as the framework preset.
 3. Leave **Build Command** empty.
-4. Set **Output Directory** to the project root (`.`).
-5. Deploy.
+4. Leave **Install Command** empty unless Vercel fills one automatically.
+5. Set **Output Directory** to the project root (`.`), or leave it blank if Vercel serves the root for the static project.
+6. Deploy.
 
-For Netlify / GitHub Pages / Cloudflare Pages, the same applies — no build step, serve the project root.
+`vercel.json` adds clean URLs plus static headers. `.vercelignore` keeps local-only files like `uploads/` and `.DS_Store` out of the deployment bundle.
+
+For Netlify / GitHub Pages / Cloudflare Pages, the same applies: no build step, serve the project root.
 
 ### Migration to Next.js (optional)
 If you later want a Next.js setup with proper routes (`/`, `/how-to-donate`):

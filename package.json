@@ -1,0 +1,10 @@
+{
+  "name": "opensense-giveth-donation-landing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static bilingual OpenSense Giveth donation landing page.",
+  "scripts": {
+    "dev": "npx serve . -l 3002",
+    "preview": "npx serve . -l 3002"
+  }
+}
